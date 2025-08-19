@@ -1,0 +1,207 @@
+import React, { useState, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  Modal, 
+  StyleSheet, 
+  Animated,
+  Platform
+} from 'react-native';
+
+const tileLabels = ['Title 1', 'Title 2', 'Title 3', 'Title 4', 'Title 5', 'Title 6'];
+
+const Tiles = () => {
+  const [selectedTile, setSelectedTile] = useState<number | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handleTilePress = (index: number) => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setSelectedTile(index);
+      setModalVisible(true);
+    });
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedTile(null);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>LOVE & ROMANCE</Text>
+      <View style={styles.grid}>
+        {tileLabels.map((label, idx) => (
+          <TouchableOpacity
+            key={label}
+            style={styles.tileContainer}
+            onPress={() => handleTilePress(idx)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.tile}>
+              <Text style={styles.tileText}>{label}</Text>
+              {idx > 0 && <Text style={styles.questionMark}>?</Text>}
+              {idx === 0 && <Text style={styles.emoji}>❤️</Text>}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{tileLabels[selectedTile ?? 0]}</Text>
+            <TouchableOpacity style={styles.optionButton}>
+              <Text style={styles.optionText}>Clue</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.optionButton, styles.optionButtonSecondary]}>
+              <Text style={styles.optionText}>Dare</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 50,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '600',
+    marginBottom: 50,
+    color: '#d53f8c',
+    textAlign: 'center',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+  },
+  tileContainer: {
+    width: '47%',
+    marginBottom: 20,
+  },
+  tile: {
+    backgroundColor: '#fff',
+    aspectRatio: 1,
+    borderRadius: 20,
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#d53f8c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+    borderWidth: 1,
+    borderColor: '#fce7f3',
+  },
+  tileText: {
+    color: '#d53f8c',
+    fontSize: 22,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  questionMark: {
+    color: '#d53f8c',
+    fontSize: 24,
+    marginTop: 5,
+  },
+  emoji: {
+    fontSize: 24,
+    marginTop: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    padding: 30,
+    alignItems: 'center',
+    width: '80%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#d53f8c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+    borderWidth: 1,
+    borderColor: '#fce7f3',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginBottom: 25,
+    color: '#d53f8c',
+  },
+  optionButton: {
+    backgroundColor: '#d53f8c',
+    borderRadius: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    marginVertical: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  optionButtonSecondary: {
+    backgroundColor: '#9f1239',
+  },
+  optionText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 12,
+    width: '100%',
+    alignItems: 'center',
+  },
+  closeText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+});
+
+export default Tiles;
