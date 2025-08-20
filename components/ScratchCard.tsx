@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Confetti from './Confetti';
+import ToyAnimation from './ToyAnimation';
 
 interface ScratchCardProps {
   content: string;
@@ -31,6 +32,7 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
 }) => {
   const [scratched, setScratched] = useState(false);
   const [scratchMask, setScratchMask] = useState<{ x: number; y: number }[]>([]);
+  const [scratchProgress, setScratchProgress] = useState(0);
   const scratchOpacity = useRef(new Animated.Value(1)).current;
   const scratchedArea = useRef(0);
   const maskPoints = useRef<Set<string>>(new Set()).current;
@@ -45,10 +47,10 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     if (!maskPoints.has(key)) {
       maskPoints.add(key);
       setScratchMask(prev => [...prev, { x: gridX, y: gridY }]);
-      
-      // Calculate scratch percentage
+        // Calculate scratch percentage
       scratchedArea.current = maskPoints.size;
       const scratchPercentage = (scratchedArea.current / totalPoints) * 100;
+      setScratchProgress(scratchPercentage);
       
       if (scratchPercentage >= 40 && !scratched) {
         revealContent();
@@ -83,11 +85,17 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
         addScratchPoint(locationX, locationY);
       },
     })
-  ).current;
-
-  return (
+  ).current;  return (
     <View style={styles.container}>
       <View style={styles.cardContainer}>
+        {/* Toy Animation Layer - positioned inside the card */}
+        <ToyAnimation 
+          active={!scratched} 
+          scratchProgress={scratchProgress} 
+          cardWidth={CARD_WIDTH}
+          cardHeight={CARD_HEIGHT}
+        />
+        
         {/* Content Layer */}
         <View style={styles.contentLayer}>
           <Text style={styles.contentText}>{content}</Text>
