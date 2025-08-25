@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@react-native-community/art": "^1.2.0",
+    "@react-native-community/blur": "^4.4.1",
     "expo": "~53.0.20",
+    "expo-blur": "^14.1.5",
     "expo-linear-gradient": "^14.1.5",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",

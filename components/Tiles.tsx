@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -6,18 +6,116 @@ import {
   Modal, 
   StyleSheet, 
   Animated,
-  Platform
+  Platform,
+  Dimensions
 } from 'react-native';
 import ScratchCard from './ScratchCard';
 
-const tileLabels = ['Title 1', 'Title 2', 'Title 3', 'Title 4', 'Title 5', 'Title 6'];
+const { width } = Dimensions.get('window');
+
+const tileLabels = [
+  'Whisper — 🤫',
+  'Oneness — 🫶', 
+  'Nexus — 🔗',
+  'Devotion — ❤️‍🔥',
+  'Eternity — ♾️',
+  'Reverie — 💭'
+];
 
 const Tiles = () => {
   const [selectedTile, setSelectedTile] = useState<number | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [showScratchCard, setShowScratchCard] = useState(false);
   const [scratchContent, setScratchContent] = useState('');
+  
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const heartPulse = useRef(new Animated.Value(1)).current;
+  const floatingAnim = useRef(new Animated.Value(0)).current;
+  const welcomeSlideAnim = useRef(new Animated.Value(-100)).current;
+  const welcomeFadeAnim = useRef(new Animated.Value(0)).current;
+  const welcomeGlowAnim = useRef(new Animated.Value(1)).current;
+
+  // Heart pulse animation
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(heartPulse, {
+          toValue: 1.2,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heartPulse, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Floating animation for hearts
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatingAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),        Animated.timing(floatingAnim, {
+          toValue: 0,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+    
+    // Fade in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+
+    // Welcome animation sequence
+    Animated.sequence([
+      Animated.timing(welcomeSlideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(welcomeFadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Welcome glow animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(welcomeGlowAnim, {
+          toValue: 1.05,
+          duration: 2000,
+          useNativeDriver: true,
+        }),        Animated.timing(welcomeGlowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const getGradientColors = (index: number) => {
+    const gradients = [
+      ['#FF69B4', '#FF1493'], // Hot pink to deep pink - Passionate love
+      ['#DC143C', '#B22222'], // Crimson to firebrick - Deep devotion
+      ['#FF6347', '#FF4500'], // Tomato to orange red - Burning passion
+      ['#9370DB', '#8A2BE2'], // Medium orchid to blue violet - Mystical romance
+      ['#FF69B4', '#C71585'], // Hot pink to medium violet red - Tender love
+      ['#DA70D6', '#BA55D3'], // Orchid to medium orchid - Dreamy romance
+    ];
+    return gradients[index] || gradients[0];
+  };
 
   const handleTilePress = (index: number) => {
     Animated.sequence([
@@ -41,26 +139,103 @@ const Tiles = () => {
     setModalVisible(false);
     setSelectedTile(null);
   };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>MYSTERY QUEST</Text>
-      <Text style={styles.subtitle}>Unlock the Adventure</Text>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      {/* Floating Hearts Background */}
+      <Animated.View style={[
+        styles.floatingHeart,
+        styles.heart1,
+        {
+          transform: [{
+            translateY: floatingAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -20]
+            })
+          }]
+        }
+      ]}>
+        <Text style={styles.heartEmoji}>💕</Text>
+      </Animated.View>
+      
+      <Animated.View style={[
+        styles.floatingHeart,
+        styles.heart2,
+        {
+          transform: [{
+            translateY: floatingAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 15]
+            })
+          }]
+        }
+      ]}>
+        <Text style={styles.heartEmoji}>💖</Text>
+      </Animated.View>
+
+      <Animated.View style={[
+        styles.floatingHeart,
+        styles.heart3,        {
+          transform: [{ scale: heartPulse }]
+        }
+      ]}>
+        <Text style={styles.heartEmoji}>💝</Text>
+      </Animated.View>
+
+      {/* Welcome Text with Animation */}
+      <Animated.View style={[
+        styles.welcomeContainer,
+        {
+          transform: [
+            { translateY: welcomeSlideAnim },
+            { scale: welcomeGlowAnim }
+          ],
+          opacity: welcomeFadeAnim
+        }
+      ]}>
+        <Text style={styles.welcomeText}>Hi Shalini 💖</Text>
+        <Text style={styles.welcomeSubtext}>Welcome to your Love Quest</Text>
+      </Animated.View>
+
+      <Text style={styles.title}>💕 LOVE QUEST 💕</Text>
+      <Text style={styles.subtitle}>Unlock Your Romantic Adventure</Text>
+      
       <View style={styles.grid}>
-        {tileLabels.map((label, idx) => (
-          <TouchableOpacity
-            key={label}
-            style={styles.tileContainer}
-            onPress={() => handleTilePress(idx)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.tile}>
-              <Text style={styles.tileText}>{label}</Text>
-              {idx > 0 && <Text style={styles.questionMark}>?</Text>}
-              {idx === 0 && <Text style={styles.emoji}>❤️</Text>}
-            </View>
-          </TouchableOpacity>
-        ))}
+        {tileLabels.map((label, idx) => {
+          const colors = getGradientColors(idx);
+          return (
+            <Animated.View
+              key={label}
+              style={[
+                styles.tileContainer,
+                {
+                  transform: [{ scale: scaleAnim }]
+                }
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.tileWrapper}
+                onPress={() => handleTilePress(idx)}
+                activeOpacity={0.8}
+              >
+                <View style={[
+                  styles.tile,
+                  {
+                    backgroundColor: colors[0],
+                    shadowColor: colors[1],
+                  }
+                ]}>
+                  <Text style={styles.tileText}>{label}</Text>
+                  {idx > 0 && <Text style={styles.questionMark}>💫</Text>}
+                  {idx === 0 && (
+                    <Animated.View style={{ transform: [{ scale: heartPulse }] }}>
+                      <Text style={styles.emoji}>💖</Text>
+                    </Animated.View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        })}
       </View>
       <Modal
         visible={modalVisible}
@@ -111,8 +286,7 @@ const Tiles = () => {
                 content={scratchContent}
                 onScratchComplete={() => {
                   // Handle scratch complete
-                }}
-                onClose={() => {
+                }}                onClose={() => {
                   setShowScratchCard(false);
                   closeModal();
                 }}
@@ -122,23 +296,69 @@ const Tiles = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'linear-gradient(135deg, #ffeef8 0%, #f8f5ff 100%)',
     paddingTop: 50,
   },
+  floatingHeart: {
+    position: 'absolute',
+    zIndex: 1,
+  },
+  heart1: {
+    top: 80,
+    left: 30,
+  },  heart2: {
+    top: 200,
+    right: 40,
+  },
+  heart3: {
+    top: 140,
+    left: width / 2 - 15,
+  },
+  heartEmoji: {
+    fontSize: 20,
+    opacity: 0.6,
+  },
+  welcomeContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#9f1239',
+    textAlign: 'center',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(159, 18, 57, 0.3)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
+  },
+  welcomeSubtext: {
+    fontSize: 16,
+    color: '#d53f8c',
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.8,
+    marginTop: 5,
+    opacity: 0.9,
+  },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '700',
     marginBottom: 8,
     color: '#9f1239',
     textAlign: 'center',
     letterSpacing: 1,
+    textShadowColor: 'rgba(159, 18, 57, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 18,
@@ -158,8 +378,10 @@ const styles = StyleSheet.create({
     width: '47%',
     marginBottom: 20,
   },
+  tileWrapper: {
+    borderRadius: 20,
+  },
   tile: {
-    backgroundColor: '#fff',
     aspectRatio: 1,
     borderRadius: 20,
     padding: 15,
@@ -167,32 +389,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: '#d53f8c',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-      },
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 15,      },
       android: {
-        elevation: 4,
+        elevation: 8,
       },
     }),
-    borderWidth: 1,
-    borderColor: '#fce7f3',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   tileText: {
-    color: '#d53f8c',
-    fontSize: 22,
-    fontWeight: '600',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
     textAlign: 'center',
+    textShadowColor: 'rgba(159, 18, 57, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   questionMark: {
-    color: '#d53f8c',
-    fontSize: 24,
-    marginTop: 5,
+    color: '#fff',
+    fontSize: 20,
+    marginTop: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   emoji: {
     fontSize: 24,
-    marginTop: 5,
+    marginTop: 8,
   },
   modalOverlay: {
     flex: 1,
