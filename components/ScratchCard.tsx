@@ -21,7 +21,7 @@ interface ScratchCardProps {
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
-const CARD_HEIGHT = 180;
+const CARD_HEIGHT = 240; // Increased height to accommodate longer text
 const SCRATCH_DOT_SIZE = 30;
 
 const ScratchCard: React.FC<ScratchCardProps> = ({
@@ -179,15 +179,15 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
     }),
-  },
-  contentLayer: {
+  },  contentLayer: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 15, // Reduced horizontal padding
+    paddingVertical: 10,   // Reduced vertical padding
     borderRadius: 20,
   },
   scratchLayer: {
@@ -218,14 +218,14 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
     borderRadius: 20,
-  },
-  contentText: {
-    fontSize: 24,
+  },  contentText: {
+    fontSize: 22, // Slightly smaller font to fit more text
     color: '#9f1239',
     textAlign: 'center',
     fontWeight: '600',
-    lineHeight: 32,
-    padding: 20,
+    lineHeight: 30, // Better line spacing
+    padding: 15, // Reduced padding to allow more text space
+    flexWrap: 'wrap', // Ensure text wraps properly
   },
   scratchText: {
     color: '#fff',

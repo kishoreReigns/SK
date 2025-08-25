@@ -312,10 +312,26 @@ const Tiles = () => {
                 <View style={styles.optionsContainer}>
                   <TouchableOpacity 
                     style={styles.optionCard}
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
-                      setScratchContent(`🔍 Here's your clue:\n\nThis is a mysterious clue for tile ${tileNumber}`);
+                    activeOpacity={0.8}                    onPress={() => {                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;                      let clueContent = '';                      if (selectedTile === 0) {
+                        // Whisper tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n🌊 Round and round your shirts will roam—peek in the cave of foam. 🧼`;
+                      } else if (selectedTile === 1) {
+                        // Oneness tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n🪙 Coins and crumbs keep secrets there can able to find the missed things there 🔍`;
+                      } else if (selectedTile === 2) {
+                        // Nexus tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n🏛️ People use me to build temples, but now I'm hiding in a tiny steel cave. 🔩`;
+                      } else if (selectedTile === 3) {
+                        // Devotion tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n🌿 I'm beneath the keeper of greens, resting low where dust gathers like silk. Guess my secret spot. 🕷️`;                      } else if (selectedTile === 4) {
+                        // Eternity tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n📱 Usually I hold screens, but now I keep a mystery with ease. Open me to find the present 🎁`;                      } else if (selectedTile === 5) {
+                        // Reverie tile specific clue with emoji
+                        clueContent = `🔍 Here's your clue:\n\n💭 You meet me before going out, but not for food, not for sleep. I hold treasures inside me. Guess my hiding spot. 👜`;
+                      } else {
+                        clueContent = `🔍 Here's your clue:\n\nThis is a mysterious clue for tile ${tileNumber}`;
+                      }
+                      setScratchContent(clueContent);
                       setShowScratchCard(true);
                     }}
                   >
@@ -333,10 +349,27 @@ const Tiles = () => {
 
                   <TouchableOpacity 
                     style={[styles.optionCard, styles.dareCard]}
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
-                      setScratchContent(`🎯 Your dare is:\n\nThis is an exciting dare for tile ${tileNumber}`);
+                    activeOpacity={0.8}                    onPress={() => {                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
+                      let dareContent = '';                      if (selectedTile === 0) {
+                        // Whisper tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n👗 I challenge you to dress up in my costume and act like me for 3 minutes 🎭`;
+                      } else if (selectedTile === 1) {
+                        // Oneness tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n😤 Reaction Challenge: we both have to show ugly faces — should not react to that! 😆`;
+                      } else if (selectedTile === 2) {
+                        // Nexus tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n📝 Write a wish on a small paper, fold it into a plane or crush, and land it in the bin to "unlock" the present. ✈️🗑️`;
+                      } else if (selectedTile === 3) {
+                        // Devotion tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n🤝 Warm Hands (45s) — hold hands and tell one memory that still warms you. 💕`;                      } else if (selectedTile === 4) {
+                        // Eternity tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n💋 Give him 25 kisses in places where he's never been kissed before. 😘`;                      } else if (selectedTile === 5) {
+                        // Reverie tile specific dare with emoji
+                        dareContent = `🎯 Your dare is:\n\n🤗 Hold a strong hug without moving, or getting distracted, no matter what he does. Stay strong! 💪`;
+                      } else {
+                        dareContent = `🎯 Your dare is:\n\nThis is an exciting dare for tile ${tileNumber}`;
+                      }
+                      setScratchContent(dareContent);
                       setShowScratchCard(true);
                     }}
                   >
