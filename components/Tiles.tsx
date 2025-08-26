@@ -266,9 +266,8 @@ const Tiles = () => {
               { scale: welcomeGlowAnim }
             ],
             opacity: welcomeFadeAnim
-          }
-        ]}>
-          <Text style={styles.welcomeText}>Hi Shalini 💖</Text>
+          }        ]}>
+          <Text style={styles.welcomeText}>My Beautiful Queen Shalini 👑💖</Text>
           <Text style={styles.welcomeSubtext}>Welcome to your Love Quest</Text>
         </Animated.View>
 

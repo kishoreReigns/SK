@@ -49,27 +49,26 @@ export default function WelcomeAlert({ visible, onClose }: WelcomeAlertProps) {
             colors={['#ff6b6b', '#ff8e8e', '#ffa8a8']}
             style={styles.gradient}
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
+            end={{ x: 1, y: 1 }}          >
             {/* Heart decoration */}
             <View style={styles.heartContainer}>
-              <Text style={styles.heartEmoji}>💝</Text>
+              <Text style={styles.heartEmoji}>👑</Text>
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Welcome, Darling! 💕</Text>
+            <Text style={styles.title}>Happy Birthday My Beautiful Queen Shalini! 👑🎂💕</Text>
             
             {/* Message */}
             <Text style={styles.message}>
-              Welcome to our lovely app! We're so excited to have you here. 
-              Get ready for an amazing experience filled with joy and surprises! ✨
+              Wishing you the most magical birthday ever, my queen! 👑✨ 
+              Today is all about celebrating you and the incredible person you are.              Get ready for a special Love Quest adventure filled with surprises just for you! 🎁💖
             </Text>
 
             {/* Decorative hearts */}
             <View style={styles.decorativeHearts}>
-              <Text style={styles.smallHeart}>💖</Text>
-              <Text style={styles.smallHeart}>💗</Text>
-              <Text style={styles.smallHeart}>💖</Text>
+              <Text style={styles.smallHeart}>🎂</Text>
+              <Text style={styles.smallHeart}>👑</Text>
+              <Text style={styles.smallHeart}>🎉</Text>
             </View>
 
             {/* OK Button */}
@@ -82,9 +81,8 @@ export default function WelcomeAlert({ visible, onClose }: WelcomeAlertProps) {
                 colors={['#ff4757', '#ff3742']}
                 style={styles.buttonGradient}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.buttonText}>Let's Begin! 💝</Text>
+                end={{ x: 1, y: 1 }}              >
+                <Text style={styles.buttonText}>Open My Gifts🎁</Text>
               </LinearGradient>
             </TouchableOpacity>
           </LinearGradient>
