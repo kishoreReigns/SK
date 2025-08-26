@@ -10,6 +10,7 @@ import {
   Dimensions,
   ScrollView
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import ScratchCard from './ScratchCard';
 
 const { width, height } = Dimensions.get('window');
@@ -28,6 +29,7 @@ const Tiles = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showScratchCard, setShowScratchCard] = useState(false);
   const [scratchContent, setScratchContent] = useState('');
+  const [openedTiles, setOpenedTiles] = useState<Set<number>>(new Set()); // Track opened tiles
   
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -37,6 +39,7 @@ const Tiles = () => {
   const welcomeFadeAnim = useRef(new Animated.Value(0)).current;
   const welcomeGlowAnim = useRef(new Animated.Value(1)).current;
   const sparkleAnim = useRef(new Animated.Value(0)).current;
+  const goldenGlowAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Heart pulse animation
@@ -100,14 +103,13 @@ const Tiles = () => {
         toValue: 0,
         duration: 800,
         useNativeDriver: true,
-      }),
-      Animated.timing(welcomeFadeAnim, {
+      }),      Animated.timing(welcomeFadeAnim, {
         toValue: 1,
         duration: 600,
         useNativeDriver: true,
       }),
     ]).start();
-
+    
     // Welcome glow animation
     Animated.loop(
       Animated.sequence([
@@ -119,6 +121,22 @@ const Tiles = () => {
         Animated.timing(welcomeGlowAnim, {
           toValue: 1,
           duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Golden glow animation for opened tiles
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(goldenGlowAnim, {
+          toValue: 1.1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(goldenGlowAnim, {
+          toValue: 1,
+          duration: 1500,
           useNativeDriver: true,
         }),
       ])
@@ -154,8 +172,11 @@ const Tiles = () => {
       setModalVisible(true);
     });
   };
-
   const closeModal = () => {
+    // Mark tile as opened if scratch card was shown (meaning content was revealed)
+    if (showScratchCard && selectedTile !== null) {
+      setOpenedTiles(prev => new Set(prev).add(selectedTile));
+    }
     setModalVisible(false);
     setSelectedTile(null);
     setShowScratchCard(false);
@@ -257,13 +278,20 @@ const Tiles = () => {
         <View style={styles.grid}>
           {tileLabels.map((label, idx) => {
             const colors = getGradientColors(idx);
+            const isOpened = openedTiles.has(idx);
             return (
               <Animated.View
                 key={`tile-${idx}`}
                 style={[
                   styles.tileContainer,
                   {
-                    transform: [{ scale: scaleAnim }]
+                    transform: [{ 
+                      scale: isOpened ? 
+                        goldenGlowAnim.interpolate({
+                          inputRange: [1, 1.1],
+                          outputRange: [1, 1.05]
+                        }) : scaleAnim 
+                    }]
                   }
                 ]}
               >
@@ -274,18 +302,101 @@ const Tiles = () => {
                 >
                   <View style={[
                     styles.tile,
+                    isOpened ? styles.openedTile : null,
                     {
-                      backgroundColor: colors[0],
-                      shadowColor: colors[1],
+                      backgroundColor: isOpened ? 'transparent' : colors[0],
+                      shadowColor: isOpened ? '#fbbf24' : colors[1],
                     }
                   ]}>
-                    <Text style={styles.tileText}>{label}</Text>
-                    {idx > 0 && <Text style={styles.questionMark}>💫</Text>}
-                    {idx === 0 && (
-                      <Animated.View style={{ transform: [{ scale: heartPulse }] }}>
-                        <Text style={styles.emoji}>💖</Text>
-                      </Animated.View>
+                    {/* Gradient overlay for opened tiles */}
+                    {isOpened && (
+                      <LinearGradient
+                        colors={['#fbbf24', '#f59e0b', '#d97706']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.openedGradient}
+                      />
                     )}
+                    
+                    {/* Sparkle effects for opened tiles */}
+                    {isOpened && (
+                      <>
+                        <Animated.View style={[
+                          styles.sparkleEffect, 
+                          styles.sparkle1Effect,
+                          {
+                            transform: [{
+                              scale: sparkleAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0.8, 1.2]
+                              })
+                            }]
+                          }
+                        ]}>
+                          <Text style={styles.sparkleText}>✨</Text>
+                        </Animated.View>
+                        <Animated.View style={[
+                          styles.sparkleEffect, 
+                          styles.sparkle2Effect,
+                          {
+                            transform: [{
+                              scale: sparkleAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [1.2, 0.8]
+                              })
+                            }]
+                          }
+                        ]}>
+                          <Text style={styles.sparkleText}>⭐</Text>
+                        </Animated.View>
+                        <Animated.View style={[
+                          styles.sparkleEffect, 
+                          styles.sparkle3Effect,
+                          {
+                            transform: [{
+                              scale: goldenGlowAnim.interpolate({
+                                inputRange: [1, 1.1],
+                                outputRange: [1, 1.3]
+                              })
+                            }]
+                          }
+                        ]}>
+                          <Text style={styles.sparkleText}>💫</Text>
+                        </Animated.View>
+                      </>
+                    )}
+                    
+                    {/* Content */}
+                    <View style={styles.tileContent}>
+                      <Text style={[
+                        styles.tileText, 
+                        isOpened ? styles.openedTileText : null
+                      ]}>
+                        {label}
+                      </Text>
+                      
+                      {isOpened ? (
+                        <View style={styles.completedContainer}>
+                          <View style={styles.completedBadge}>
+                            <Text style={styles.completedIcon}>👑</Text>
+                            <Text style={styles.completedText}>COMPLETED</Text>
+                          </View>
+                          <Text style={styles.completedEmoji}>🎉</Text>
+                        </View>
+                      ) : (
+                        <>
+                          {idx > 0 && <Text style={styles.questionMark}>💫</Text>}
+                          {idx === 0 && (
+                            <Animated.View style={{ transform: [{ scale: heartPulse }] }}>
+                              <Text style={styles.emoji}>💖</Text>
+                            </Animated.View>
+                          )}
+                        </>
+                      )}
+                    </View>
+                    
+                    {/* Golden border for opened tiles */}
+                    {isOpened && <View style={styles.goldenBorder} />}
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -312,24 +423,24 @@ const Tiles = () => {
                 <View style={styles.optionsContainer}>
                   <TouchableOpacity 
                     style={styles.optionCard}
-                    activeOpacity={0.8}                    onPress={() => {                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;                      let clueContent = '';                      if (selectedTile === 0) {
-                        // Whisper tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n🌊 Round and round your shirts will roam—peek in the cave of foam. 🧼`;
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
+                      let clueContent = '';
+                      if (selectedTile === 0) {
+                        clueContent = '🔍 Here\'s your clue:\n\n🌊 Round and round your shirts will roam—peek in the cave of foam. 🧼';
                       } else if (selectedTile === 1) {
-                        // Oneness tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n🪙 Coins and crumbs keep secrets there can able to find the missed things there 🔍`;
+                        clueContent = '🔍 Here\'s your clue:\n\n🪙 Coins and crumbs keep secrets there can able to find the missed things there 🔍';
                       } else if (selectedTile === 2) {
-                        // Nexus tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n🏛️ People use me to build temples, but now I'm hiding in a tiny steel cave. 🔩`;
+                        clueContent = '🔍 Here\'s your clue:\n\n🏛️ People use me to build temples, but now I\'m hiding in a tiny steel cave. 🔩';
                       } else if (selectedTile === 3) {
-                        // Devotion tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n🌿 I'm beneath the keeper of greens, resting low where dust gathers like silk. Guess my secret spot. 🕷️`;                      } else if (selectedTile === 4) {
-                        // Eternity tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n📱 Usually I hold screens, but now I keep a mystery with ease. Open me to find the present 🎁`;                      } else if (selectedTile === 5) {
-                        // Reverie tile specific clue with emoji
-                        clueContent = `🔍 Here's your clue:\n\n💭 You meet me before going out, but not for food, not for sleep. I hold treasures inside me. Guess my hiding spot. 👜`;
+                        clueContent = '🔍 Here\'s your clue:\n\n🌿 I\'m beneath the keeper of greens, resting low where dust gathers like silk. Guess my secret spot. 🕷️';
+                      } else if (selectedTile === 4) {
+                        clueContent = '🔍 Here\'s your clue:\n\n📱 Usually I hold screens, but now I keep a mystery with ease. Open me to find the present 🎁';
+                      } else if (selectedTile === 5) {
+                        clueContent = '🔍 Here\'s your clue:\n\n💭 You meet me before going out, but not for food, not for sleep. I hold treasures inside me. Guess my hiding spot. 👜';
                       } else {
-                        clueContent = `🔍 Here's your clue:\n\nThis is a mysterious clue for tile ${tileNumber}`;
+                        clueContent = '🔍 Here\'s your clue:\n\nThis is a mysterious clue for tile ' + tileNumber;
                       }
                       setScratchContent(clueContent);
                       setShowScratchCard(true);
@@ -347,27 +458,26 @@ const Tiles = () => {
                     <View style={[styles.optionGlow, styles.clueGlow]} />
                   </TouchableOpacity>
 
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.optionCard, styles.dareCard]}
-                    activeOpacity={0.8}                    onPress={() => {                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
-                      let dareContent = '';                      if (selectedTile === 0) {
-                        // Whisper tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n👗 I challenge you to dress up in my costume and act like me for 3 minutes 🎭`;
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      const tileNumber = selectedTile !== null ? selectedTile + 1 : 1;
+                      let dareContent = '';
+                      if (selectedTile === 0) {
+                        dareContent = '🎯 Your dare is:\n\n👗 I challenge you to dress up in my costume and act like me for 3 minutes 🎭';
                       } else if (selectedTile === 1) {
-                        // Oneness tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n😤 Reaction Challenge: we both have to show ugly faces — should not react to that! 😆`;
+                        dareContent = '🎯 Your dare is:\n\n😤 Reaction Challenge: we both have to show ugly faces — should not react to that! 😆';
                       } else if (selectedTile === 2) {
-                        // Nexus tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n📝 Write a wish on a small paper, fold it into a plane or crush, and land it in the bin to "unlock" the present. ✈️🗑️`;
+                        dareContent = '🎯 Your dare is:\n\n📝 Write a wish on a small paper, fold it into a plane or crush, and land it in the bin to "unlock" the present. ✈️🗑️';
                       } else if (selectedTile === 3) {
-                        // Devotion tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n🤝 Warm Hands (45s) — hold hands and tell one memory that still warms you. 💕`;                      } else if (selectedTile === 4) {
-                        // Eternity tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n💋 Give him 25 kisses in places where he's never been kissed before. 😘`;                      } else if (selectedTile === 5) {
-                        // Reverie tile specific dare with emoji
-                        dareContent = `🎯 Your dare is:\n\n🤗 Hold a strong hug without moving, or getting distracted, no matter what he does. Stay strong! 💪`;
+                        dareContent = '🎯 Your dare is:\n\n🤝 Warm Hands (45s) — hold hands and tell one memory that still warms you. 💕';
+                      } else if (selectedTile === 4) {
+                        dareContent = '🎯 Your dare is:\n\n💋 Give him 25 kisses in places where he\'s never been kissed before. 😘';
+                      } else if (selectedTile === 5) {
+                        dareContent = '🎯 Your dare is:\n\n🤗 Hold a strong hug without moving, or getting distracted, no matter what he does. Stay strong! 💪';
                       } else {
-                        dareContent = `🎯 Your dare is:\n\nThis is an exciting dare for tile ${tileNumber}`;
+                        dareContent = '🎯 Your dare is:\n\nThis is an exciting dare for tile ' + tileNumber;
                       }
                       setScratchContent(dareContent);
                       setShowScratchCard(true);
@@ -553,13 +663,130 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     marginTop: 10,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',    textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
   emoji: {
     fontSize: 28,
     marginTop: 10,
+  },
+  completedMark: {
+    fontSize: 32,
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  openedTile: {
+    position: 'relative',
+    overflow: 'visible',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#fbbf24',
+        shadowOffset: { width: 0, height: 15 },
+        shadowOpacity: 0.6,
+        shadowRadius: 25,
+      },      android: {
+        elevation: 20,
+      },
+    }),
+  },
+  openedGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 25,
+  },
+  goldenBorder: {
+    position: 'absolute',
+    top: -3,
+    left: -3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 28,
+    borderWidth: 3,
+    borderColor: '#fbbf24',
+    backgroundColor: 'transparent',
+    zIndex: -1,
+  },
+  sparkleEffect: {
+    position: 'absolute',
+    zIndex: 3,
+  },
+  sparkle1Effect: {
+    top: 10,
+    right: 15,
+  },
+  sparkle2Effect: {
+    top: 20,
+    left: 10,
+  },
+  sparkle3Effect: {
+    bottom: 15,
+    right: 20,
+  },
+  sparkleText: {
+    fontSize: 18,
+    opacity: 0.9,
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  tileContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+    flex: 1,
+  },
+  openedTileText: {
+    color: '#fff',
+    fontWeight: '900',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },  completedContainer: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  completedBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#fbbf24',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#fbbf24',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  completedIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  completedText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#d97706',
+    letterSpacing: 1,
+  },
+  completedEmoji: {
+    fontSize: 24,
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   modalOverlay: {
     flex: 1,
@@ -594,13 +821,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginBottom: 30,
     color: '#9f1239',
-    textAlign: 'center',
-    letterSpacing: 1,
+    textAlign: 'center',    letterSpacing: 1,
     textTransform: 'uppercase',
   },
   optionsContainer: {
     width: '100%',
-    gap: 20,
   },
   optionCard: {
     backgroundColor: '#fff',
@@ -610,6 +835,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 3,
     borderColor: '#f9a8d4',
+    marginBottom: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#d53f8c',
