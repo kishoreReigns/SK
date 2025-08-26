@@ -57,11 +57,9 @@ export default function WelcomeAlert({ visible, onClose }: WelcomeAlertProps) {
 
             {/* Title */}
             <Text style={styles.title}>Happy Birthday My Beautiful Queen Shalini! 👑🎂💕</Text>
-            
-            {/* Message */}
+              {/* Message */}
             <Text style={styles.message}>
-              Wishing you the most magical birthday ever, my queen! 👑✨ 
-              Today is all about celebrating you and the incredible person you are.              Get ready for a special Love Quest adventure filled with surprises just for you! 🎁💖
+              Wishing you the most magical birthday ever, my queen! 👑✨ Today is all about celebrating you and the incredible person you are. Get ready for a special Love Quest adventure filled with surprises just for you! 🎁💖
             </Text>
 
             {/* Decorative hearts */}
@@ -81,8 +79,9 @@ export default function WelcomeAlert({ visible, onClose }: WelcomeAlertProps) {
                 colors={['#ff4757', '#ff3742']}
                 style={styles.buttonGradient}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}              >
-                <Text style={styles.buttonText}>Open My Gifts🎁</Text>
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.buttonText}>Open My Gifts! 🎁👑</Text>
               </LinearGradient>
             </TouchableOpacity>
           </LinearGradient>

@@ -30,6 +30,7 @@ const Tiles = () => {
   const [showScratchCard, setShowScratchCard] = useState(false);
   const [scratchContent, setScratchContent] = useState('');
   const [openedTiles, setOpenedTiles] = useState<Set<number>>(new Set()); // Track opened tiles
+  const [showInfoModal, setShowInfoModal] = useState(false); // Info modal state
   
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -103,7 +104,8 @@ const Tiles = () => {
         toValue: 0,
         duration: 800,
         useNativeDriver: true,
-      }),      Animated.timing(welcomeFadeAnim, {
+      }),
+      Animated.timing(welcomeFadeAnim, {
         toValue: 1,
         duration: 600,
         useNativeDriver: true,
@@ -266,13 +268,25 @@ const Tiles = () => {
               { scale: welcomeGlowAnim }
             ],
             opacity: welcomeFadeAnim
-          }        ]}>
+          }
+        ]}>
           <Text style={styles.welcomeText}>My Beautiful Queen Shalini 👑💖</Text>
           <Text style={styles.welcomeSubtext}>Welcome to your Love Quest</Text>
         </Animated.View>
 
         <Text style={styles.title}>💕 LOVE QUEST 💕</Text>
         <Text style={styles.subtitle}>Unlock Your Romantic Adventure</Text>
+        
+        {/* Info Icon */}
+        <TouchableOpacity 
+          style={styles.infoIcon}
+          onPress={() => setShowInfoModal(true)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.infoIconContainer}>
+            <Text style={styles.infoIconText}>ℹ️</Text>
+          </View>
+        </TouchableOpacity>
         
         <View style={styles.grid}>
           {tileLabels.map((label, idx) => {
@@ -512,10 +526,60 @@ const Tiles = () => {
                 onClose={() => {
                   setShowScratchCard(false);
                   closeModal();
-                }}
-                coverColor={scratchContent.includes('🔍') ? '#d53f8c' : '#9f1239'}
+                }}                coverColor={scratchContent.includes('🔍') ? '#d53f8c' : '#9f1239'}
               />
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Info Modal */}
+      <Modal
+        visible={showInfoModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.infoModalContent}>
+            <Text style={styles.infoModalTitle}>🎮 Love Quest Rules & Guidelines 💖</Text>
+            
+            <ScrollView style={styles.infoScrollView} showsVerticalScrollIndicator={false}>
+              <Text style={styles.sectionTitle}>📋 How to Play:</Text>
+              <Text style={styles.ruleText}>• Tap on any tile to start your romantic adventure</Text>
+              <Text style={styles.ruleText}>• Choose between "Get a Clue" or "Take a Dare"</Text>
+              <Text style={styles.ruleText}>• Scratch the card to reveal your surprise</Text>
+              <Text style={styles.ruleText}>• Complete the challenge to unlock golden rewards</Text>
+              
+              <Text style={styles.sectionTitle}>💝 Game Rules:</Text>
+              <Text style={styles.ruleText}>• Each tile contains unique romantic surprises</Text>
+              <Text style={styles.ruleText}>• Clues lead to hidden gifts around your space</Text>
+              <Text style={styles.ruleText}>• Dares are fun romantic challenges to complete</Text>
+              <Text style={styles.ruleText}>• Completed tiles show beautiful golden animations</Text>
+              
+              <Text style={styles.importantRuleTitle}>⏰ IMPORTANT TIME RULE:</Text>
+              <Text style={styles.importantRuleText}>
+                🎯 Every clue has a 1 minute 30 seconds time limit! If you haven't found the hidden present within this time, you must complete the dare instead to earn your reward. No exceptions - the clock is ticking! ⏱️
+              </Text>
+              
+              <Text style={styles.sectionTitle}>👑 Special Notes:</Text>
+              <Text style={styles.ruleText}>• This game is made with love for Queen Shalini</Text>
+              <Text style={styles.ruleText}>• Take your time and enjoy each moment</Text>
+              <Text style={styles.ruleText}>• Have fun and create beautiful memories together</Text>
+              
+              <Text style={styles.sectionTitle}>🎂 Birthday Special:</Text>
+              <Text style={styles.ruleText}>• Today is all about celebrating you, my queen!</Text>
+              <Text style={styles.ruleText}>• Each surprise is carefully crafted for your birthday</Text>
+              <Text style={styles.ruleText}>• Enjoy your special Love Quest adventure!</Text>
+            </ScrollView>
+            
+            <TouchableOpacity 
+              onPress={() => setShowInfoModal(false)} 
+              style={styles.infoCloseButton}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.infoCloseText}>Got it! Let's Play! 🎮💖</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -607,14 +671,43 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(159, 18, 57, 0.3)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 8,
-  },
-  subtitle: {
+  },  subtitle: {
     fontSize: 20,
     color: '#d53f8c',
     textAlign: 'center',
     marginBottom: 50,
     fontWeight: '600',
     letterSpacing: 1,
+  },
+  infoIcon: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  infoIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#d53f8c',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+    borderWidth: 2,
+    borderColor: '#d53f8c',
+  },
+  infoIconText: {
+    fontSize: 20,
   },
   grid: {
     flexDirection: 'row',
@@ -947,13 +1040,121 @@ const styles = StyleSheet.create({
         elevation: 6,
       },
     }),
-  },
-  closeText: {
+  },  closeText: {
     color: '#9f1239',
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: 1,
     textTransform: 'uppercase',
+  },
+  infoModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    padding: 25,
+    width: '90%',
+    maxWidth: 400,
+    maxHeight: '80%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+      },
+      android: {
+        elevation: 15,
+      },
+    }),
+    borderWidth: 3,
+    borderColor: '#f9a8d4',
+  },
+  infoModalTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#9f1239',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 1,
+  },
+  infoScrollView: {
+    maxHeight: 400,
+    marginBottom: 20,
+  },  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#d53f8c',
+    marginTop: 15,
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  importantRuleTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#dc2626',
+    marginTop: 20,
+    marginBottom: 12,
+    letterSpacing: 0.8,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    textShadowColor: 'rgba(220, 38, 38, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  importantRuleText: {
+    fontSize: 16,
+    color: '#dc2626',
+    lineHeight: 24,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    backgroundColor: '#fef2f2',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#fca5a5',
+    fontWeight: '600',
+    textAlign: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#dc2626',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  ruleText: {
+    fontSize: 15,
+    color: '#374151',
+    lineHeight: 22,
+    marginBottom: 6,
+    paddingLeft: 5,
+  },
+  infoCloseButton: {
+    backgroundColor: '#d53f8c',
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#d53f8c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  infoCloseText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 

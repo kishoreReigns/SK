@@ -45,9 +45,9 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     const key = `${gridX},${gridY}`;
 
     if (!maskPoints.has(key)) {
-      maskPoints.add(key);
-      setScratchMask(prev => [...prev, { x: gridX, y: gridY }]);
-        // Calculate scratch percentage
+      maskPoints.add(key);      setScratchMask(prev => [...prev, { x: gridX, y: gridY }]);
+      
+      // Calculate scratch percentage
       scratchedArea.current = maskPoints.size;
       const scratchPercentage = (scratchedArea.current / totalPoints) * 100;
       setScratchProgress(scratchPercentage);
@@ -84,8 +84,7 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
         const { locationX, locationY } = evt.nativeEvent;
         addScratchPoint(locationX, locationY);
       },
-    })
-  ).current;  return (
+    })  ).current;  return (
     <View style={styles.container}>
       <View style={styles.cardContainer}>
         {/* Toy Animation Layer - positioned inside the card */}
@@ -177,9 +176,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 8,
-      },
-    }),
-  },  contentLayer: {
+      },    }),
+  },
+  contentLayer: {
     position: 'absolute',
     width: '100%',
     height: '100%',
