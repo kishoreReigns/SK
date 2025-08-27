@@ -9,6 +9,7 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
+import { Audio } from 'expo-av';
 import Confetti from './Confetti';
 import ToyAnimation from './ToyAnimation';
 
@@ -58,13 +59,22 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     }
   };
 
-  const revealContent = () => {
+  const revealContent = async () => {
     setScratched(true);
     Animated.timing(scratchOpacity, {
       toValue: 0,
       duration: 600,
       useNativeDriver: true,
-    }).start(() => {
+    }).start(async () => {
+      // Play reveal sound
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/reveal.mp3')
+        );
+        await sound.playAsync();
+      } catch (e) {
+        // Handle error silently
+      }
       onScratchComplete?.();
     });
   };
