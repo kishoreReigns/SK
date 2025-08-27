@@ -20,10 +20,17 @@
         "foregroundImage": "./assets/sk-logo.png",
         "backgroundColor": "#ffeef8"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.kishore0109.sk"
     },
     "web": {
       "favicon": "./assets/sk-logo.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86e19a0f-b166-46cc-a526-6dad84b39b49"
+      }
+    },
+    "owner": "kishore0109"
   }
 }
