@@ -8,6 +8,7 @@ import {
   Dimensions,
   Platform,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import Confetti from './Confetti';
@@ -20,9 +21,9 @@ interface ScratchCardProps {
   onClose: () => void;
 }
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
-const CARD_HEIGHT = 240; // Increased height to accommodate longer text
+const CARD_HEIGHT = Math.min(height * 0.4, 320); // Dynamic height, max 320px
 const SCRATCH_DOT_SIZE = 30;
 
 const ScratchCard: React.FC<ScratchCardProps> = ({
@@ -104,10 +105,15 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
           cardWidth={CARD_WIDTH}
           cardHeight={CARD_HEIGHT}
         />
-        
-        {/* Content Layer */}
+          {/* Content Layer */}
         <View style={styles.contentLayer}>
-          <Text style={styles.contentText}>{content}</Text>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <Text style={styles.contentText}>{content}</Text>
+          </ScrollView>
         </View>
 
         {/* Scratch Layer */}
@@ -187,17 +193,22 @@ const styles = StyleSheet.create({
       android: {
         elevation: 8,
       },    }),
-  },
-  contentLayer: {
+  },  contentLayer: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 15, // Reduced horizontal padding
-    paddingVertical: 10,   // Reduced vertical padding
+    paddingHorizontal: 12,
+    paddingVertical: 15,
     borderRadius: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100%',
   },
   scratchLayer: {
     position: 'absolute',
@@ -228,13 +239,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
   },  contentText: {
-    fontSize: 22, // Slightly smaller font to fit more text
+    fontSize: 18, // Reduced font size for better fit
     color: '#9f1239',
     textAlign: 'center',
     fontWeight: '600',
-    lineHeight: 30, // Better line spacing
-    padding: 15, // Reduced padding to allow more text space
-    flexWrap: 'wrap', // Ensure text wraps properly
+    lineHeight: 24, // Tighter line spacing
+    padding: 8, // Minimal padding
+    flexWrap: 'wrap',
   },
   scratchText: {
     color: '#fff',
